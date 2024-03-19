@@ -2318,6 +2318,13 @@ class RenderWebGL extends EventEmitter {
     }
 
     /**
+     * Get the DrawableId of the pen layer
+     */
+    getPenDrawableId () {
+        return this._allDrawables.findIndex(drawable => drawable._skin._id === this._penSkinId);
+    }
+
+    /**
      * Update the list of custom fonts. These fonts will be added to the DOM.
      * SEURITY CONSIDERATIONS: It is the caller's responsibility to ensure that the @font-face
      * statements do not contain malicious styles.
