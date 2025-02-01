@@ -3,27 +3,6 @@ const twgl = require('twgl.js');
 const CanvasMeasurementProvider = require('./util/canvas-measurement-provider');
 const Skin = require('./Skin');
 
-const BubbleStyle = {
-    MAX_LINE_WIDTH: 170, // Maximum width, in Scratch pixels, of a single line of text
-
-    MIN_WIDTH: 50, // Minimum width, in Scratch pixels, of a text bubble
-    STROKE_WIDTH: 4, // Thickness of the stroke around the bubble. Only half's visible because it's drawn under the fill
-    PADDING: 10, // Padding around the text area
-    CORNER_RADIUS: 16, // Radius of the rounded corners
-    TAIL_HEIGHT: 12, // Height of the speech bubble's "tail". Probably should be a constant.
-
-    FONT: 'Helvetica', // Font to render the text with
-    FONT_SIZE: 14, // Font size, in Scratch pixels
-    FONT_HEIGHT_RATIO: 0.9, // Height, in Scratch pixels, of the text, as a proportion of the font's size
-    LINE_HEIGHT: 16, // Spacing between each line of text
-
-    COLORS: {
-        BUBBLE_FILL: 'white',
-        BUBBLE_STROKE: 'rgba(0, 0, 0, 0.15)',
-        TEXT_FILL: '#575E75'
-    }
-};
-
 const MAX_SCALE = 10;
 
 class TextBubbleSkin extends Skin {
@@ -65,7 +44,26 @@ class TextBubbleSkin extends Skin {
         this._textureDirty = true;
 
         /** @type {object} */
-        this.bubbleStyling = BubbleStyle;
+        this.BubbleStyle = {
+            MAX_LINE_WIDTH: 170, // Maximum width, in Scratch pixels, of a single line of text
+
+            MIN_WIDTH: 50, // Minimum width, in Scratch pixels, of a text bubble
+            STROKE_WIDTH: 4, // Thickness of the stroke around the bubble. Only half's visible because it's drawn under the fill
+            PADDING: 10, // Padding around the text area
+            CORNER_RADIUS: 16, // Radius of the rounded corners
+            TAIL_HEIGHT: 12, // Height of the speech bubble's "tail". Probably should be a constant.
+
+            FONT: 'Helvetica', // Font to render the text with
+            FONT_SIZE: 14, // Font size, in Scratch pixels
+            FONT_HEIGHT_RATIO: 0.9, // Height, in Scratch pixels, of the text, as a proportion of the font's size
+            LINE_HEIGHT: 16, // Spacing between each line of text
+
+            COLORS: {
+                BUBBLE_FILL: 'white',
+                BUBBLE_STROKE: 'rgba(0, 0, 0, 0.15)',
+                TEXT_FILL: '#575E75'
+            }
+        };
 
         this.measurementProvider = new CanvasMeasurementProvider(this._canvas.getContext('2d'));
         this.textWrapper = renderer.createTextWrapper(this.measurementProvider);
@@ -115,14 +113,14 @@ class TextBubbleSkin extends Skin {
      * Re-style the canvas after resizing it. This is necessary to ensure proper text measurement.
      */
     _restyleCanvas () {
-        this._canvas.getContext('2d').font = `${BubbleStyle.FONT_SIZE}px ${BubbleStyle.FONT}, sans-serif`;
+        this._canvas.getContext('2d').font = `${this.BubbleStyle.FONT_SIZE}px ${this.BubbleStyle.FONT}, sans-serif`;
     }
 
     /**
      * Update the array of wrapped lines and the text dimensions.
      */
     _reflowLines () {
-        this._lines = this.textWrapper.wrapText(BubbleStyle.MAX_LINE_WIDTH, this._text);
+        this._lines = this.textWrapper.wrapText(this.BubbleStyle.MAX_LINE_WIDTH, this._text);
 
         // Measure width of longest line to avoid extra-wide bubbles
         let longestLineWidth = 0;
@@ -131,14 +129,14 @@ class TextBubbleSkin extends Skin {
         }
 
         // Calculate the canvas-space sizes of the padded text area and full text bubble
-        const paddedWidth = Math.max(longestLineWidth, BubbleStyle.MIN_WIDTH) + (BubbleStyle.PADDING * 2);
-        const paddedHeight = (BubbleStyle.LINE_HEIGHT * this._lines.length) + (BubbleStyle.PADDING * 2);
+        const paddedWidth = Math.max(longestLineWidth, this.BubbleStyle.MIN_WIDTH) + (this.BubbleStyle.PADDING * 2);
+        const paddedHeight = (this.BubbleStyle.LINE_HEIGHT * this._lines.length) + (this.BubbleStyle.PADDING * 2);
 
         this._textAreaSize.width = paddedWidth;
         this._textAreaSize.height = paddedHeight;
 
-        this._size[0] = paddedWidth + BubbleStyle.STROKE_WIDTH;
-        this._size[1] = paddedHeight + BubbleStyle.STROKE_WIDTH + BubbleStyle.TAIL_HEIGHT;
+        this._size[0] = paddedWidth + this.BubbleStyle.STROKE_WIDTH;
+        this._size[1] = paddedHeight + this.BubbleStyle.STROKE_WIDTH + this.BubbleStyle.TAIL_HEIGHT;
 
         this._textDirty = false;
     }
@@ -168,7 +166,7 @@ class TextBubbleSkin extends Skin {
         ctx.clearRect(0, 0, this._canvas.width, this._canvas.height);
 
         ctx.scale(scale, scale);
-        ctx.translate(BubbleStyle.STROKE_WIDTH * 0.5, BubbleStyle.STROKE_WIDTH * 0.5);
+        ctx.translate(this.BubbleStyle.STROKE_WIDTH * 0.5, this.BubbleStyle.STROKE_WIDTH * 0.5);
 
         // If the text bubble points leftward, flip the canvas
         ctx.save();
@@ -179,16 +177,16 @@ class TextBubbleSkin extends Skin {
 
         // Draw the bubble's rounded borders
         ctx.beginPath();
-        ctx.moveTo(BubbleStyle.CORNER_RADIUS, paddedHeight);
-        ctx.arcTo(0, paddedHeight, 0, paddedHeight - BubbleStyle.CORNER_RADIUS, BubbleStyle.CORNER_RADIUS);
-        ctx.arcTo(0, 0, paddedWidth, 0, BubbleStyle.CORNER_RADIUS);
-        ctx.arcTo(paddedWidth, 0, paddedWidth, paddedHeight, BubbleStyle.CORNER_RADIUS);
-        ctx.arcTo(paddedWidth, paddedHeight, paddedWidth - BubbleStyle.CORNER_RADIUS, paddedHeight,
-            BubbleStyle.CORNER_RADIUS);
+        ctx.moveTo(this.BubbleStyle.CORNER_RADIUS, paddedHeight);
+        ctx.arcTo(0, paddedHeight, 0, paddedHeight - this.BubbleStyle.CORNER_RADIUS, this.BubbleStyle.CORNER_RADIUS);
+        ctx.arcTo(0, 0, paddedWidth, 0, this.BubbleStyle.CORNER_RADIUS);
+        ctx.arcTo(paddedWidth, 0, paddedWidth, paddedHeight, this.BubbleStyle.CORNER_RADIUS);
+        ctx.arcTo(paddedWidth, paddedHeight, paddedWidth - this.BubbleStyle.CORNER_RADIUS, paddedHeight,
+            this.BubbleStyle.CORNER_RADIUS);
 
         // Translate the canvas so we don't have to do a bunch of width/height arithmetic
         ctx.save();
-        ctx.translate(paddedWidth - BubbleStyle.CORNER_RADIUS, paddedHeight);
+        ctx.translate(paddedWidth - this.BubbleStyle.CORNER_RADIUS, paddedHeight);
 
         // Draw the bubble's "tail"
         if (this._bubbleType === 'say') {
@@ -215,9 +213,9 @@ class TextBubbleSkin extends Skin {
         // Un-translate the canvas and fill + stroke the text bubble
         ctx.restore();
 
-        ctx.fillStyle = BubbleStyle.COLORS.BUBBLE_FILL;
-        ctx.strokeStyle = BubbleStyle.COLORS.BUBBLE_STROKE;
-        ctx.lineWidth = BubbleStyle.STROKE_WIDTH;
+        ctx.fillStyle = this.BubbleStyle.COLORS.BUBBLE_FILL;
+        ctx.strokeStyle = this.BubbleStyle.COLORS.BUBBLE_STROKE;
+        ctx.lineWidth = this.BubbleStyle.STROKE_WIDTH;
 
         ctx.stroke();
         ctx.fill();
@@ -226,16 +224,16 @@ class TextBubbleSkin extends Skin {
         ctx.restore();
 
         // Draw each line of text
-        ctx.fillStyle = BubbleStyle.COLORS.TEXT_FILL;
-        ctx.font = `${BubbleStyle.FONT_SIZE}px ${BubbleStyle.FONT}, sans-serif`;
+        ctx.fillStyle = this.BubbleStyle.COLORS.TEXT_FILL;
+        ctx.font = `${this.BubbleStyle.FONT_SIZE}px ${this.BubbleStyle.FONT}, sans-serif`;
         const lines = this._lines;
         for (let lineNumber = 0; lineNumber < lines.length; lineNumber++) {
             const line = lines[lineNumber];
             ctx.fillText(
                 line,
-                BubbleStyle.PADDING,
-                BubbleStyle.PADDING + (BubbleStyle.LINE_HEIGHT * lineNumber) +
-                    (BubbleStyle.FONT_HEIGHT_RATIO * BubbleStyle.FONT_SIZE)
+                this.BubbleStyle.PADDING,
+                this.BubbleStyle.PADDING + (this.BubbleStyle.LINE_HEIGHT * lineNumber) +
+                    (this.BubbleStyle.FONT_HEIGHT_RATIO * this.BubbleStyle.FONT_SIZE)
             );
         }
 
