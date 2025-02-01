@@ -64,6 +64,9 @@ class TextBubbleSkin extends Skin {
         /** @type {boolean} */
         this._textureDirty = true;
 
+        /** @type {object} */
+        this.bubbleStyling = BubbleStyle;
+
         this.measurementProvider = new CanvasMeasurementProvider(this._canvas.getContext('2d'));
         this.textWrapper = renderer.createTextWrapper(this.measurementProvider);
 
